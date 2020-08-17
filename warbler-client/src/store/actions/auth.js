@@ -1,4 +1,4 @@
- import apicall from "../../services/api";
+ import { apicall, setTokenHeader } from "../../services/api";
  import {SET_CURRENT_USER} from "../actionTypes";
  import { addError, removeError } from "./errors";
 
@@ -9,9 +9,14 @@
      };
  }
 
+ export function setAuthorizationToken(token){
+     setTokenHeader(token);
+ }
+
  export function logout(){
      return dispatch => {
          localStorage.clear();
+         setAuthorizationToken(false);
          dispatch(setcurrentUser({}));
      };
  }
@@ -22,6 +27,7 @@
          return new Promise((resolve, reject) => {
              return apicall("post", `api/auth/${type}`, userData).then(({token, ...user}) => {
                localStorage.setItem("jwtToken", token)
+               setAuthorizationToken(token);
                dispatch(setcurrentUser(user)); //indicate that api call succeed
                dispatch(removeError());
                resolve();
